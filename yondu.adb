@@ -1,4 +1,5 @@
 with Ada.Text_IO;
+with Ada.Exceptions;
 
 procedure Yondu is 
     type Num_Reavers is new Integer range 3 .. Integer'Last;
@@ -11,11 +12,30 @@ procedure Yondu is
     Share_Crew, Share_Yondu, Share_Peter, Share_Rbf: Integer;
 
 begin 
-    Ada.Text_IO.Put_Line("How many reavers are there? ");
-    reavers := Num_Reavers'Value(Ada.Text_IO.Get_Line);
+    loop 
+        begin
+            Ada.Text_IO.Put_Line("How many reavers are there? ");
+            reavers := Num_Reavers'Value(Ada.Text_IO.Get_Line);
+            exit;
+        exception
+            when Constraint_Error =>
+                Ada.Text_IO.Put_Line("Not enough crew, try again");
+        end;
+    end loop;
 
-    Ada.Text_IO.Put_Line("How many units did they bring in? ");
-    units := Num_Units'Value(Ada.Text_IO.Get_Line);
+    loop 
+        begin
+            Ada.Text_IO.Put_Line("How many units did they bring in? ");
+            units := Num_Units'Value(Ada.Text_IO.Get_Line);
+            if Integer(units) <= (3 * Integer(reavers)) then
+                raise Constraint_Error;
+            end if;
+            exit;
+        exception
+            when Constraint_Error =>
+                Ada.Text_IO.Put_Line("Not enough units, try again");
+        end;
+    end loop;
 
     Units_After_Lotus := Integer(units) - 3 * (Integer(reavers) - 2);
     Units_After_Yondu := Integer(Float'Truncation(Float(Units_After_Lotus) * 0.87));
